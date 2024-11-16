@@ -1,0 +1,406 @@
+#:kivy 2.1.0
+# レイアウト設定
+
+
+<MainScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.3
+
+        BoxLayout:
+            size_hint_y: 0.3
+            Button:
+                text: '貸出'
+                font_size: 100
+                font_name: 'NotoSans'
+                on_press: root.go_to_rental_screen()
+
+            Button:
+                text: '返却'
+                font_size: 100
+                font_name: 'NotoSans'
+                on_press: root.go_to_return_screen()
+            Button:
+                text: '予約'
+                font_size: 100
+                font_name: 'NotoSans'
+                on_press: root.go_to_return_screen()
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+
+        BoxLayout:
+            size_hint_y: 0.2
+
+            Button:
+                text: 'ユーザ登録'
+                font_size: 50
+                font_name: 'NotoSans'
+                on_press: root.go_to_user_registration_screen()
+
+            Button:
+                text: '備品登録'
+                font_size: 50
+                font_name: 'NotoSans'
+                on_press: root.go_to_item_registration_screen()
+            
+            Button:
+                text: '登録ユーザ一覧'
+                font_size: 50
+                font_name: 'NotoSans'
+                on_press: root.go_to_user_list_screen()
+        
+            Button:
+                text: '登録備品一覧'
+                font_size: 50
+                font_name: 'NotoSans'
+                on_press: root.go_to_item_list_screen()
+
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+
+<Rental_Uid_Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Label:
+            text: "ICカードをタッチしてください"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            id: message_label  
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Button:
+            id: back_to_main_button
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_x: 0.4
+            opacity: 0  # 初期状態で非表示
+            disabled: True  # 初期状態で無効化
+            on_press: root.manager.current = 'main'  # ボタンが押されたらメイン画面に戻る
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+
+<Rental_Iid_Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Label:
+            id: tag_label
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            text: "備品タグをタッチしてください"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            id: message_label  
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.3
+
+<RentalResultScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Label:
+            id: tag_label
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Button:
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+            on_press: root.go_to_main_screen()
+        Label:
+            text: "5秒後に自動でメイン画面に戻ります"
+            font_size: 36
+            font_name: 'NotoSans'
+            size_hint_y: 0.3
+
+<ReturnScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Label:
+            text: "備品タグをタッチしてください"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            id: message_label
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.5
+
+<ReturnResultScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Label:
+            id: tag_label
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Button:
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+            on_press: root.go_to_main_screen()
+        Label:
+            text: "5秒後に自動でメイン画面に戻ります"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.3
+
+<UserRegistrationScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Label:
+            id: message_label
+            text: '社員証をタッチしてください'
+            font_name: 'NotoSans'
+            font_size: 50
+            size_hint_y: 0.2
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Button:
+            id: back_to_main_button
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+            opacity: 0  # 初期状態で非表示
+            disabled: True  # 初期状態で無効化
+            on_press: root.manager.current = 'main'  # ボタンが押されたらメイン画面に戻る
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.3
+
+<UserRegistrationScreen2>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: '名前'
+            font_name: 'NotoSans'
+        TextInput:
+            id: name_input
+            hint_text: '名前を入力'
+            font_name: 'NotoSans'
+        Label:
+            text: '所属'
+            font_name: 'NotoSans'
+        TextInput:
+            id: department_input
+            hint_text: '所属を入力'
+            font_name: 'NotoSans'
+        Label:
+            text: '従業員番号'
+            font_name: 'NotoSans'
+        TextInput:
+            id: employee_id_input
+            hint_text: '従業員番号を入力'
+            font_name: 'NotoSans'
+        Label:
+            text: '内線番号'
+            font_name: 'NotoSans'
+        TextInput:
+            id: phone_number_input
+            hint_text: '内線番号を入力'
+            font_name: 'NotoSans'
+        Button:
+            text: '登録'
+            font_name: 'NotoSans'
+            font_size: 50
+            on_press: root.regist()
+        Button:
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            on_press: root.go_to_main_screen()
+        Label:
+            id: message_label
+            text: ""
+            font_name: 'NotoSans'
+            font_size: 50
+
+<ItemRegistrationScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Label:
+            id: message_label
+            text: '備品をタッチしてください'
+            font_name: 'NotoSans'
+            font_size: 50
+            size_hint_y: 0.2
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Button:
+            id: back_to_main_button
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+            opacity: 0  # 初期状態で非表示
+            disabled: True  # 初期状態で無効化
+            on_press: root.manager.current = 'main'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.3
+
+<ItemRegistrationScreen2>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: '名前'
+            font_name: 'NotoSans'
+        TextInput:
+            id: name_input
+            hint_text: '名前を入力'
+            font_name: 'NotoSans'
+        Label:
+            text: 'アイテムID'
+            font_name: 'NotoSans'
+        TextInput:
+            id: item_id_input
+            hint_text: 'アイテムIDを入力'
+            font_name: 'NotoSans'
+        Label:
+            text: '管理者'
+            font_name: 'NotoSans'
+        TextInput:
+            id: administrator_input
+            hint_text: '管理者を入力'
+            font_name: 'NotoSans'
+        Label:
+            text: '備考'
+            font_name: 'NotoSans'
+        TextInput:
+            id: note_input
+            hint_text: '備考を入力'
+            font_name: 'NotoSans'
+        Button:
+            text: '登録'
+            font_name: 'NotoSans'
+            font_size: 50
+            on_press: root.regist()
+        Button:
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            on_press: root.go_to_main_screen()
+        Label:
+            id: message_label
+            text: ""
+            font_name: 'NotoSans'
+            font_size: 50
+
+<UserListScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        ScrollView:
+            Label:
+                id: user_list
+                text: root.get_user_list_text()
+                font_size: 36
+                font_name: 'NotoSans'
+                size_hint_y: None
+                height: self.texture_size[1]
+        Button:
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+            on_press: root.go_to_main_screen()
+
+<ItemListScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        ScrollView:
+            Label:
+                id: item_list
+                text: root.get_item_list_text()
+                font_size: 36
+                font_name: 'NotoSans'
+                size_hint_y: None
+                height: self.texture_size[1]
+        Button:
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+            on_press: root.go_to_main_screen()
