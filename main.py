@@ -85,6 +85,9 @@ class MainScreen(Screen):
     def go_to_return_screen(self):
         self.manager.current = 'return'
 
+    def go_to_reserve_screen(self):
+        self.manager.current = 'reserve_uid'
+
     def go_to_user_registration_screen(self):
         self.manager.current = 'user_registration'
 
@@ -213,6 +216,78 @@ class ReturnScreen(TimedScreen):
 #--------------------------------------------------------------------------------------------------
 # 返却結果画面
 class ReturnResultScreen(TimedScreen):
+    def set_message(self, message):
+        self.ids.tag_label.text = message
+
+    def go_to_main_screen(self):
+        self.manager.current = 'main'
+        self.ids.tag_label.text = ""
+
+#--------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
+# 予約画面 (uid読み取り)
+class Reserve_Uid_Screen(TimedScreen):
+    def on_enter(self):
+        nfc_handler = NFCHandler()
+        if not nfc_handler.connect_nfc():
+            self.show_error("NFCデバイスの接続に失敗しました")
+            return
+
+        uid = nfc_handler.read_tag()
+        if uid is None:
+            self.show_error("UIDの読み取りに失敗しました")
+            return
+
+        result_screen = self.manager.get_screen('reserve_info')
+        result_screen.set_uid(uid)
+        
+        if fun.check_user_registered(USER_FILE, uid):
+            user_name = fun.get_user_name(USER_FILE, uid)
+            result_screen.set_uid(user_name)
+            self.manager.current = 'reserve_info'  # 次の画面に遷移
+        else:
+            self.show_error("ユーザが未登録です")
+            self.show_back_to_main_button()  # ボタンを表示
+            return
+
+    def show_error(self, message):
+        self.ids.message_label.text = message  # エラーメッセージを画面に表示
+
+    def show_back_to_main_button(self):
+        # 「メインに戻る」ボタンを表示
+        self.ids.back_to_main_button.opacity = 1
+        self.ids.back_to_main_button.disabled = False
+
+    def reset_screen(self):
+        # メッセージとボタンをリセット
+        self.ids.message_label.text = ""
+        self.ids.back_to_main_button.opacity = 0
+        self.ids.back_to_main_button.disabled = True
+
+    def go_to_main_screen(self):
+        # メイン画面に戻るときにリセット処理を追加
+        self.manager.current = 'main'
+
+    def on_leave(self):
+        # 画面を離れる時にリセット
+        self.reset_screen()
+
+#--------------------------------------------------------------------------------------------------
+# 予約期間入力画面（カレンダー）
+class Reserve_Info_Screen(TimedScreen):
+    def set_uid(self, uid):
+        self.ids.tag_label.text = f"{uid}"
+        
+    def set_message(self, message):
+        self.ids.tag_label.text = message
+
+    def go_to_main_screen(self):
+        self.manager.current = 'main'
+        self.ids.tag_label.text = ""
+
+#--------------------------------------------------------------------------------------------------
+# 予約結果画面
+class ReserveResultScreen(TimedScreen):
     def set_message(self, message):
         self.ids.tag_label.text = message
 
@@ -448,6 +523,9 @@ class NFCApp(App):
         sm.add_widget(RentalResultScreen(name='rental_result'))
         sm.add_widget(ReturnScreen(name='return'))
         sm.add_widget(ReturnResultScreen(name='return_result'))
+        sm.add_widget(Reserve_Uid_Screen(name='reserve_uid'))
+        sm.add_widget(Reserve_Info_Screen(name='reserve_info'))
+        sm.add_widget(ReserveResultScreen(name='reserve_result'))
         sm.add_widget(UserRegistrationScreen(name='user_registration'))
         sm.add_widget(UserRegistrationScreen2(name='user_registration2'))
         sm.add_widget(ItemRegistrationScreen(name='item_registration'))

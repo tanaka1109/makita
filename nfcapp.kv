@@ -27,7 +27,7 @@
                 text: '予約'
                 font_size: 100
                 font_name: 'NotoSans'
-                on_press: root.go_to_return_screen()
+                on_press: root.go_to_reserve_screen()
         Label:
             text: ""
             font_name: 'NotoSans'
@@ -212,6 +212,103 @@
             font_size: 50
             font_name: 'NotoSans'
             size_hint_y: 0.3
+
+<Reserve_Uid_Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Label:
+            text: "ICカードをタッチしてください"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            id: message_label  
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Button:
+            id: back_to_main_button
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_x: 0.4
+            opacity: 0  # 初期状態で非表示
+            disabled: True  # 初期状態で無効化
+            on_press: root.manager.current = 'main'  # ボタンが押されたらメイン画面に戻る
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+
+<Reserve_Info_Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Label:
+            id: tag_label
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Button:
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+            on_press: root.go_to_main_screen()
+        Label:
+            text: "5秒後に自動でメイン画面に戻ります"
+            font_size: 36
+            font_name: 'NotoSans'
+            size_hint_y: 0.3
+
+<ReserveResultScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ""
+            font_name: 'NotoSans'
+            size_hint_y: 0.1
+        Label:
+            id: tag_label
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Label:
+            text: ""
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+        Button:
+            text: "メインに戻る"
+            font_size: 50
+            font_name: 'NotoSans'
+            size_hint_y: 0.2
+            on_press: root.go_to_main_screen()
+        Label:
+            text: "5秒後に自動でメイン画面に戻ります"
+            font_size: 36
+            font_name: 'NotoSans'
+            size_hint_y: 0.3
+
 
 <UserRegistrationScreen>:
     BoxLayout:
