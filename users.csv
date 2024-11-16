@@ -1,11 +1,11 @@
 ﻿uid,name,department,employee_id,phone_number,states
-044f5efa846b80,tanaka,4G,15133,3591,
 044f5efa846b81,sugiura,4G,15111,1111,
 044f5efa846b82,hirahata,4G,15222,2222,
+044f5efa846b86,onoda,4G,15666,6666,
 044f5efa846b83,mathuisi,4G,15333,3333,
 044f5efa846b84,yamaguti,4G,15444,4444,
 044f5efa846b85,maeno,4G,15555,5555,
-044f5efa846b86,onoda,4G,15666,6666,
 044f5efa846b87,nagao,4G,15777,7777,
 044f5efa846b88,noziri,4G,15888,8888,
 044f5efa846b89,watanabe,4G,15999,9999,
+044f5efa846b80,tanaka,4G,15133,3591

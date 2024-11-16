@@ -469,14 +469,16 @@
 <UserListScreen>:
     BoxLayout:
         orientation: 'vertical'
-        ScrollView:
-            Label:
-                id: user_list
-                text: root.get_user_list_text()
-                font_size: 36
-                font_name: 'NotoSans'
-                size_hint_y: None
-                height: self.texture_size[1]
+        BoxLayout:
+            id: user_list_container
+            orientation: 'vertical'
+            size_hint_y: 0.9
+            ScrollView:
+                GridLayout:
+                    id: user_table
+                    cols: 5
+                    size_hint_y: None
+                    height: self.minimum_height
         Button:
             text: "メインに戻る"
             font_size: 50
@@ -487,14 +489,16 @@
 <ItemListScreen>:
     BoxLayout:
         orientation: 'vertical'
-        ScrollView:
-            Label:
-                id: item_list
-                text: root.get_item_list_text()
-                font_size: 36
-                font_name: 'NotoSans'
-                size_hint_y: None
-                height: self.texture_size[1]
+        BoxLayout:
+            id: item_list_container
+            orientation: 'vertical'
+            size_hint_y: 0.9
+            ScrollView:
+                GridLayout:
+                    id: item_table
+                    cols: 4
+                    size_hint_y: None
+                    height: self.minimum_height
         Button:
             text: "メインに戻る"
             font_size: 50

@@ -145,7 +145,11 @@ def check_reserved(check_csv_file_name, rental_start, rental_end):
 # 登録済みユーザーのリストを取得する関数
 def get_list(file_path):
     try:
-        return pd.read_csv(file_path, encoding='utf-8').to_dict('records')
+        # データを読み取り、社員ID順にソート
+        data = pd.read_csv(file_path, encoding='utf-8')
+        if 'employee_id' in data.columns:
+            data = data.sort_values(by='employee_id', ascending=True)
+        return data.to_dict('records')
     except Exception as e:
         print(f"Error getting list: {e}")
         return []

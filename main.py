@@ -15,6 +15,8 @@ from kivy.uix.label         import Label
 from kivy.uix.gridlayout    import GridLayout
 from kivy.uix.button        import Button
 from kivy.properties        import ListProperty
+from kivy.uix.scrollview    import ScrollView
+from kivy.graphics import Color, Line
 
 # ファイル
 USER_FILE = 'users.csv'
@@ -453,12 +455,67 @@ class ItemRegistrationScreen2(Screen):
 #--------------------------------------------------------------------------------------------------
 # ユーザ確認画面
 class UserListScreen(Screen):
-    def get_user_list_text(self):
+    def get_user_list(self):
         users = fun.get_list(USER_FILE)
-        return '\n'.join([f"UID: {user['uid']}, 名前: {user['name']}, 部署: {user['department']}, 社員ID: {user['employee_id']}, 電話番号: {user['phone_number']}" for user in users])
+        return users
+
+    def create_table(self, users):
+        layout = GridLayout(cols=5, size_hint_y=None)
+        layout.bind(minimum_height=layout.setter('height'))
+
+        headers = ['UID', '名前', '所属', '従業員番号', '内線']
+        for header in headers:
+            label = Label(
+                text=header, size_hint_y=None, height=50,
+                halign='center', valign='middle',
+                font_name='NotoSans',
+                font_size=40
+            )
+            label.bind(size=label.setter('text_size'))
+
+            def draw_lines(instance, *args):
+                instance.canvas.before.clear()
+                with instance.canvas.before:
+                    Color(1, 1, 1, 1)  # 白色の線
+                    Line(points=[instance.x, instance.y, instance.x + instance.width, instance.y])  # 下線
+                    Line(points=[instance.x, instance.y, instance.x, instance.y + instance.height])  # 左線
+                    Line(points=[instance.x, instance.y + instance.height, instance.x + instance.width, instance.y + instance.height])  # 上線
+                    Line(points=[instance.x + instance.width, instance.y, instance.x + instance.width, instance.y + instance.height])  # 右線
+
+            label.bind(size=draw_lines, pos=draw_lines)
+            layout.add_widget(label)
+
+        for user in users:
+            for key in ['uid', 'name', 'department', 'employee_id', 'phone_number']:
+                label = Label(
+                    text=str(user.get(key, '')), size_hint_y=None, height=50,
+                    halign='center', valign='middle',
+                    font_name='NotoSans',
+                    font_size=36
+                )
+                label.bind(size=label.setter('text_size'))
+
+                def draw_lines(instance, *args):
+                    instance.canvas.before.clear()
+                    with instance.canvas.before:
+                        Color(1, 1, 1, 1)  # 白色の線
+                        Line(points=[instance.x, instance.y, instance.x + instance.width, instance.y])  # 下線
+                        Line(points=[instance.x, instance.y, instance.x, instance.y + instance.height])  # 左線
+                        Line(points=[instance.x, instance.y + instance.height, instance.x + instance.width, instance.y + instance.height])  # 上線
+                        Line(points=[instance.x + instance.width, instance.y, instance.x + instance.width, instance.y + instance.height])  # 右線
+
+                label.bind(size=draw_lines, pos=draw_lines)
+                layout.add_widget(label)
+
+        return layout
 
     def on_enter(self):
-        self.ids.user_list.text = self.get_user_list_text()
+        users = self.get_user_list()
+        table = self.create_table(users)
+        scroll_view = ScrollView(size_hint=(1, 1))
+        scroll_view.add_widget(table)
+        self.ids.user_list_container.clear_widgets()
+        self.ids.user_list_container.add_widget(scroll_view)
 
     def go_to_main_screen(self):
         self.manager.current = 'main'
@@ -466,47 +523,104 @@ class UserListScreen(Screen):
 #--------------------------------------------------------------------------------------------------
 # 備品確認画面
 class ItemListScreen(Screen):
-    def get_item_list_text(self):
-        df = fun.get_item_list_df()
-        df['user_name'] = None
-        df['phone_number'] = None
+    def get_item_list(self):
+        # items.csvを読み込み
+        try:
+            items_df = pd.read_csv(ITEM_FILE, encoding='utf-8')
+        except Exception as e:
+            print(f"Error reading {ITEM_FILE}: {e}")
+            return pd.DataFrame()
 
-        tmp_uid = df[df['states'] != fun.ItemState.USABLE.value]['uid']
+        # users.csvを読み込み
+        try:
+            users_df = pd.read_csv(USER_FILE, encoding='utf-8')
+        except Exception as e:
+            print(f"Error reading {USER_FILE}: {e}")
+            return pd.DataFrame()
 
-        for user in tmp_uid:
-            try:
-                tmp_df = fun.get_reg_item_date(user)
-                if not tmp_df.empty:
-                    tmp_df2 = fun.get_user_data(tmp_df.iloc[-1]['user_id'])
-                    if not tmp_df2.empty:
-                        df.loc[df['uid'] == user, 'user_name'] = tmp_df2.iloc[-1]['name']
-                        df.loc[df['uid'] == user, 'phone_number'] = tmp_df2.iloc[-1]['phone_number']
-                    else:
-                        df.loc[df['uid'] == user, 'user_name'] = None
-                        df.loc[df['uid'] == user, 'phone_number'] = None
-                else:
-                    df.loc[df['uid'] == user, 'user_name'] = None
-                    df.loc[df['uid'] == user, 'phone_number'] = None
-            except Exception as e:
-                print(f"エラーが発生しました: {e}")
-                df.loc[df['uid'] == user, 'user_name'] = None
-                df.loc[df['uid'] == user, 'phone_number'] = None
+        # 貸出状況の初期設定
+        items_df['貸出状況'] = '貸出可能'
+        items_df['利用者'] = '-'
+        items_df['内線'] = '-'
 
-        df2 = df.loc[:, ['name', 'states', 'user_name', 'phone_number']]
-        conditions = [df2['states'] == fun.ItemState.USED.value]
-        choices = ['貸出中']
-        df2['states'] = np.select(conditions, choices, default='貸出可能')
+        # 貸出中のアイテムを処理
+        borrowed_items = items_df[items_df['states'] != 0]
+        for _, row in borrowed_items.iterrows():
+            user_data = users_df[users_df['uid'] == row['uid']]
+            if not user_data.empty:
+                items_df.loc[items_df['uid'] == row['uid'], '利用者'] = user_data.iloc[-1]['name']
+                items_df.loc[items_df['uid'] == row['uid'], '内線'] = user_data.iloc[-1]['phone_number']
+                items_df.loc[items_df['uid'] == row['uid'], '貸出状況'] = '貸出中'
 
-        item_list = []
-        for index, row in df2.iterrows():
-            user_name = row['user_name'] if row['user_name'] is not None else ''
-            phone_number = row['phone_number'] if row['phone_number'] is not None else ''
-            item_list.append(f"登録備品: {row['name']}, 貸出状況: {row['states']}, 利用者: {user_name}, 内線番号: {phone_number}")
+        # 必要な列のみ取得してソート
+        items_df = items_df[['name', '貸出状況', '利用者', '内線']].rename(columns={
+            'name': '登録備品'
+        })
+        items_df = items_df.sort_values(by='登録備品')
+        return items_df
 
-        return '\n'.join(item_list)
+    def create_table(self, items_df):
+        layout = GridLayout(cols=4, size_hint_y=None)
+        layout.bind(minimum_height=layout.setter('height'))
+
+        # ヘッダーを作成
+        headers = ['登録備品', '貸出状況', '利用者', '内線']
+        for header in headers:
+            label = Label(
+                text=header, size_hint_y=None, height=50,
+                halign='center', valign='middle',
+                font_name='NotoSans',
+                font_size=40
+            )
+
+            # 線を描画する関数
+            def draw_lines(instance, *args):
+                instance.canvas.before.clear()
+                with instance.canvas.before:
+                    Color(1, 1, 1, 1)  # 白色の線
+                    Line(points=[instance.x, instance.y, instance.x + instance.width, instance.y])  # 下線
+                    Line(points=[instance.x, instance.y, instance.x, instance.y + instance.height])  # 左線
+                    Line(points=[instance.x, instance.y + instance.height, instance.x + instance.width, instance.y + instance.height])  # 上線
+                    Line(points=[instance.x + instance.width, instance.y, instance.x + instance.width, instance.y + instance.height])  # 右線
+
+            label.bind(size=draw_lines, pos=draw_lines)
+            layout.add_widget(label)
+
+        # データ行を追加
+        for _, row in items_df.iterrows():
+            for cell in row:
+                label = Label(
+                    text=str(cell), size_hint_y=None, height=50,
+                    halign='center', valign='middle',
+                    font_name='NotoSans',
+                    font_size=36
+                )
+
+                # 線を描画する関数
+                def draw_lines(instance, *args):
+                    instance.canvas.before.clear()
+                    with instance.canvas.before:
+                        Color(1, 1, 1, 1)  # 白色の線
+                        Line(points=[instance.x, instance.y, instance.x + instance.width, instance.y])  # 下線
+                        Line(points=[instance.x, instance.y, instance.x, instance.y + instance.height])  # 左線
+                        Line(points=[instance.x, instance.y + instance.height, instance.x + instance.width, instance.y + instance.height])  # 上線
+                        Line(points=[instance.x + instance.width, instance.y, instance.x + instance.width, instance.y + instance.height])  # 右線
+
+                label.bind(size=draw_lines, pos=draw_lines)
+                layout.add_widget(label)
+
+        return layout
 
     def on_enter(self):
-        self.ids.item_list.text = self.get_item_list_text()
+        items_df = self.get_item_list()
+        if items_df.empty:
+            print("No data available for items.")
+            return
+        table = self.create_table(items_df)
+        scroll_view = ScrollView(size_hint=(1, 1))
+        scroll_view.add_widget(table)
+        self.ids.item_list_container.clear_widgets()
+        self.ids.item_list_container.add_widget(scroll_view)
 
     def go_to_main_screen(self):
         self.manager.current = 'main'
